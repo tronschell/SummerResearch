@@ -82,15 +82,15 @@ for doc in range(0, 3286):
             # display the dataframe
             pos_dat
             try:
-                item_1a_raw = document['10-K'][pos_dat['start'].loc['item1a']:pos_dat['start'].loc['item1b']]
+                item_7_raw = document['10-K'][pos_dat['start'].loc['item7']:pos_dat['start'].loc['item7a']]
             except:
                 #print('cannot seperate sections')
-                item_1a_raw.clear()
+                item_7_raw.clear()
                 continue
             count+=1
             
             #Add all of the paragraphs to the item_1a_paragrpahs list
-            item_7_content = BeautifulSoup(item_1a_raw, 'lxml')
+            item_7_content = BeautifulSoup(item_7_raw, 'lxml')
             item_7_paragraphs = item_7_content.findAll('span')
             #For every word in the range of the length of the list of "primary_word list" run the code underneath
             for p_word in range(len(primary_wordlist)):
