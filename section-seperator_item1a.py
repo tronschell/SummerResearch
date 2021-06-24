@@ -7,7 +7,7 @@ import time
 documents = []
 count_not_found = 0
 primary_wordlist = ['COVID-19', 'pandemic']
-secondary_wordlist = ['supply chain']
+secondary_wordlist = ['supply chain', 'operational disruption', 'logistics network', 'outsourcing']
 regex = ""
 
 not_found = []
@@ -119,29 +119,41 @@ for doc in range(0, 3286):
                             
                             #For every secondary word in the secondary word list, run the code below
                             for s_word in range(len(secondary_wordlist)):
+                                paragraphthere = False
                                 # If there is a secondary word in the before paragraph, then run the code underneath
                                 if secondary_wordlist[s_word] in before_found:
                                     print("CIK: ", current_cik[doc])
                                     print('PRIMARY WORD: ', primary_wordlist[p_word])
+                                    print('SECONDARY WORD:', secondary_wordlist[s_word])
                                     print('++++++++++ITEM 1A: Risk Factors++++++++++', '\n\n')
-                                    print("\tbefore: ",before_found, '\n\n')
-                                    
-                                    print("\tmatch: ",found, '\n\n')
-                                    print("----------------------")
                                     # If there is a secondary word in the after found paragraph, then run the code underneath
                                     if secondary_wordlist[s_word] in after_found:
+                                        paragraphthere = True
+                                    else:
+                                        paragraphthere = False
+                                        pass
+                                    
+                                    if paragraphthere == True:
+                                        print("\tbefore: ",before_found, '\n\n')
+                                        print("\tmatch: ",found, '\n\n')
                                         print("\tafter: ", after_found, '\n\n')
                                         print("----------------------")
                                     else:
-                                        pass
+                                        print("\tbefore: ",before_found, '\n\n')
+                                        print("\tmatch: ",found, '\n\n')
+                                        print("----------------------")
+                                        
+
                                 # Else if there is a secondary word in the after found paragraph, then run the code underneath
                                 elif secondary_wordlist[s_word] in after_found:
                                     print("CIK: ", current_cik[doc])
                                     print('PRIMARY WORD: ', primary_wordlist[p_word])
+                                    print('SECONDARY WORD:', secondary_wordlist[s_word])
                                     print('++++++++++ITEM 1A: Risk Factors++++++++++', '\n\n')
                                     print("\tmatch: ",found, '\n\n')
                                     print("\tafter: ",after_found, '\n\n')
                                     print("----------------------")
+
                                 else:
                                     pass      
                         except:
@@ -154,6 +166,7 @@ for doc in range(0, 3286):
             continue
     # Clear the paragraphs list so that we dont keep appending new data to it without removing the last documents paragraphs
     item_1a_paragraphs.clear()
+    paragraphthere = False
 """
 print(count_not_found)
 print((len(documents)-len(not_found))/len(documents))
