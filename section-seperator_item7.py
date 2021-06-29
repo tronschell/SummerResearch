@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 import re
 import pandas as pd
 import os
-import time
+import json
 
 documents = []
 count_not_found = 0
@@ -13,6 +13,9 @@ regex = ""
 not_found = []
 foundcount = 1
 count = 0
+uni_count = 0
+
+found_dict = {}
 
 # This finds all of the files with the .txt extension and adds the name of the file to the list called "documents"
 for root, dirs, files, in os.walk('2020/'):
@@ -116,7 +119,7 @@ for doc in range(0, 3286):
                             while len(after_found) <= 2:
                                 foundcount +=1
                                 after_found = str(item_7_paragraphs[j+foundcount].get_text())
-                            
+                            uni_count +=1
                             #For every secondary word in the secondary word list, run the code below
                             for s_word in range(len(secondary_wordlist)):
                                 paragraphthere = False
@@ -131,16 +134,29 @@ for doc in range(0, 3286):
                                     else:
                                         paragraphthere = False
                                         pass
+
+                                    uni_count+=1
                                     
                                     if paragraphthere == True:
                                         print("\tbefore: ",before_found, '\n\n')
                                         print("\tmatch: ",found, '\n\n')
                                         print("\tafter: ", after_found, '\n\n')
                                         print("----------------------")
+                                        found_dict[uni_count] = {
+                                            "CIK" : current_cik[doc],
+                                            "before": before_found,
+                                            "match" : found,
+                                            "after" : after_found
+                                        }
                                     else:
                                         print("\tbefore: ",before_found, '\n\n')
                                         print("\tmatch: ",found, '\n\n')
                                         print("----------------------")
+                                        found_dict[uni_count] = {
+                                            "CIK" : current_cik[doc],
+                                            "before": before_found,
+                                            "match" : found,
+                                        }
 
                                 # Else if there is a secondary word in the after found paragraph, then run the code underneath
                                 elif secondary_wordlist[s_word] in after_found:
@@ -151,6 +167,12 @@ for doc in range(0, 3286):
                                     print("\tmatch: ",found, '\n\n')
                                     print("\tafter: ",after_found, '\n\n')
                                     print("----------------------")
+                                    uni_count+=1
+                                    found_dict[uni_count] = {
+                                            "CIK" : current_cik[doc],
+                                            "match" : found,
+                                            "after" : after_found
+                                        }
                                 else:
                                     pass      
                         except:
@@ -163,6 +185,9 @@ for doc in range(0, 3286):
             continue
     # Clear the paragraphs list so that we dont keep appending new data to it without removing the last documents paragraphs
     item_7_paragraphs.clear()
+
+with open("item_7.json", "w") as json_file:
+    json.dump(found_dict, json_file, indent=4)
 """
 print(count_not_found)
 print((len(documents)-len(not_found))/len(documents))
