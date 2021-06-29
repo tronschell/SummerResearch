@@ -14,6 +14,7 @@ regex = ""
 not_found = []
 foundcount = 1
 count = 0
+uni_count = 0
 
 found_dict = {}
 
@@ -119,7 +120,7 @@ for doc in range(0, 100):
                             while len(after_found) <= 2:
                                 foundcount +=1
                                 after_found = str(item_1a_paragraphs[j+foundcount].get_text())
-                            
+                            uni_count +=1
                             #For every secondary word in the secondary word list, run the code below
                             for s_word in range(len(secondary_wordlist)):
                                 paragraphthere = False
@@ -136,26 +137,28 @@ for doc in range(0, 100):
                                         paragraphthere = False
                                         pass
                                     
+                                    uni_count+=1
+
                                     if paragraphthere == True:
                                         print("\tbefore: ",before_found, '\n\n')
                                         print("\tmatch: ",found, '\n\n')
                                         print("\tafter: ", after_found, '\n\n')
                                         print("----------------------")
-                                        found_dict.update({
+                                        found_dict[uni_count] = {
                                             "CIK" : current_cik[doc],
                                             "before": before_found,
                                             "match" : found,
                                             "after" : after_found
-                                        })
+                                        }
                                     else:
                                         print("\tbefore: ",before_found, '\n\n')
                                         print("\tmatch: ",found, '\n\n')
                                         print("----------------------")
-                                        found_dict.update({
+                                        found_dict[uni_count] = {
                                             "CIK" : current_cik[doc],
                                             "before": before_found,
                                             "match" : found,
-                                        })
+                                        }
                                         
 
                                 # Else if there is a secondary word in the after found paragraph, then run the code underneath
@@ -167,11 +170,12 @@ for doc in range(0, 100):
                                     print("\tmatch: ",found, '\n\n')
                                     print("\tafter: ",after_found, '\n\n')
                                     print("----------------------")
-                                    found_dict.update({
+                                    uni_count +=1
+                                    found_dict[uni_count] = {
                                             "CIK" : current_cik[doc],
                                             "match" : found,
                                             "after" : after_found
-                                        })
+                                        }
 
                                 else:
                                     pass
