@@ -3,6 +3,7 @@ import re
 import pandas as pd
 import os
 import time
+import json
 
 documents = []
 count_not_found = 0
@@ -14,13 +15,15 @@ not_found = []
 foundcount = 1
 count = 0
 
+found_dict = {}
+
 # This finds all of the files with the .txt extension and adds the name of the file to the list called "documents"
 for root, dirs, files, in os.walk('2020/'):
     for file in files:
         if file.endswith('.txt'):
             documents.append(os.path.join(root, file))
 
-for doc in range(0, 3286):
+for doc in range(0, 100):
     path = str(documents[doc])
 
     current_cik = os.listdir('2020/')
@@ -138,10 +141,21 @@ for doc in range(0, 3286):
                                         print("\tmatch: ",found, '\n\n')
                                         print("\tafter: ", after_found, '\n\n')
                                         print("----------------------")
+                                        found_dict.update({
+                                            "CIK" : current_cik[doc],
+                                            "before": before_found,
+                                            "match" : found,
+                                            "after" : after_found
+                                        })
                                     else:
                                         print("\tbefore: ",before_found, '\n\n')
                                         print("\tmatch: ",found, '\n\n')
                                         print("----------------------")
+                                        found_dict.update({
+                                            "CIK" : current_cik[doc],
+                                            "before": before_found,
+                                            "match" : found,
+                                        })
                                         
 
                                 # Else if there is a secondary word in the after found paragraph, then run the code underneath
@@ -153,10 +167,17 @@ for doc in range(0, 3286):
                                     print("\tmatch: ",found, '\n\n')
                                     print("\tafter: ",after_found, '\n\n')
                                     print("----------------------")
+                                    found_dict.update({
+                                            "CIK" : current_cik[doc],
+                                            "match" : found,
+                                            "after" : after_found
+                                        })
 
                                 else:
-                                    pass      
-                        except:
+                                    pass
+
+                                
+                        except: 
                             pass
         except:
             not_found.append(current_cik[doc])
@@ -167,6 +188,9 @@ for doc in range(0, 3286):
     # Clear the paragraphs list so that we dont keep appending new data to it without removing the last documents paragraphs
     item_1a_paragraphs.clear()
     paragraphthere = False
+
+with open("item_1a.json", "w") as json_file:
+    json.dump(found_dict, json_file, indent=4)
 """
 print(count_not_found)
 print((len(documents)-len(not_found))/len(documents))
