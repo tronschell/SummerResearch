@@ -147,7 +147,7 @@ for doc in range(len(documents)):
                                         found_dict[uni_count] = {
                                             "CIK" : current_cik[doc],
                                             "Company Name" : getCompanyName(documents[doc]),
-                                            "Item": "1A: Risk Factors",
+                                            "Item": "7: Management’s Discussion and Analysis of Financial Condition and Results of Operations",
                                             "Primary Word" : primary_wordlist[p_word],
                                             "Secondary Word" : secondary_wordlist[s_word],
                                             "before": before_found,
@@ -162,7 +162,7 @@ for doc in range(len(documents)):
                                         found_dict[uni_count] = {
                                             "CIK" : current_cik[doc],
                                             "Company Name" : getCompanyName(documents[doc]),
-                                            "Item": "1A: Risk Factors",
+                                            "Item": "7: Management’s Discussion and Analysis of Financial Condition and Results of Operations",
                                             "Primary Word" : primary_wordlist[p_word],
                                             "Secondary Word" : secondary_wordlist[s_word],
                                             "before": before_found,
@@ -179,11 +179,11 @@ for doc in range(len(documents)):
                                     print("\tafter: ",after_found, '\n\n')
                                     print("----------------------")
                                     uni_count+=1
-                                    
+
                                     found_dict[uni_count] = {
                                             "CIK" : current_cik[doc],
                                             "Company Name" : getCompanyName(documents[doc]),
-                                            "Item": "1A: Risk Factors",
+                                            "Item": "7: Management’s Discussion and Analysis of Financial Condition and Results of Operations",
                                             "Primary Word" : primary_wordlist[p_word],
                                             "Secondary Word" : secondary_wordlist[s_word],
                                             "match" : found,
