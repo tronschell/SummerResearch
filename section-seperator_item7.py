@@ -3,11 +3,12 @@ import re
 import pandas as pd
 import os
 import json
+from company_name import *
 
 documents = []
 count_not_found = 0
 primary_wordlist = ['COVID-19', 'pandemic']
-secondary_wordlist = ['supply chain']
+secondary_wordlist = ['supply chain', 'operational disruption', 'logistics network', 'outsourcing']
 regex = ""
 
 not_found = []
@@ -23,7 +24,7 @@ for root, dirs, files, in os.walk('2020/'):
         if file.endswith('.txt'):
             documents.append(os.path.join(root, file))
 
-for doc in range(0, 3286):
+for doc in range(len(documents)):
     path = str(documents[doc])
 
     current_cik = os.listdir('2020/')
@@ -142,8 +143,13 @@ for doc in range(0, 3286):
                                         print("\tmatch: ",found, '\n\n')
                                         print("\tafter: ", after_found, '\n\n')
                                         print("----------------------")
+
                                         found_dict[uni_count] = {
                                             "CIK" : current_cik[doc],
+                                            "Company Name" : getCompanyName(documents[doc]),
+                                            "Item": "1A: Risk Factors",
+                                            "Primary Word" : primary_wordlist[p_word],
+                                            "Secondary Word" : secondary_wordlist[s_word],
                                             "before": before_found,
                                             "match" : found,
                                             "after" : after_found
@@ -152,8 +158,13 @@ for doc in range(0, 3286):
                                         print("\tbefore: ",before_found, '\n\n')
                                         print("\tmatch: ",found, '\n\n')
                                         print("----------------------")
+
                                         found_dict[uni_count] = {
                                             "CIK" : current_cik[doc],
+                                            "Company Name" : getCompanyName(documents[doc]),
+                                            "Item": "1A: Risk Factors",
+                                            "Primary Word" : primary_wordlist[p_word],
+                                            "Secondary Word" : secondary_wordlist[s_word],
                                             "before": before_found,
                                             "match" : found,
                                         }
@@ -168,8 +179,13 @@ for doc in range(0, 3286):
                                     print("\tafter: ",after_found, '\n\n')
                                     print("----------------------")
                                     uni_count+=1
+                                    
                                     found_dict[uni_count] = {
                                             "CIK" : current_cik[doc],
+                                            "Company Name" : getCompanyName(documents[doc]),
+                                            "Item": "1A: Risk Factors",
+                                            "Primary Word" : primary_wordlist[p_word],
+                                            "Secondary Word" : secondary_wordlist[s_word],
                                             "match" : found,
                                             "after" : after_found
                                         }
@@ -186,7 +202,7 @@ for doc in range(0, 3286):
     # Clear the paragraphs list so that we dont keep appending new data to it without removing the last documents paragraphs
     item_7_paragraphs.clear()
 
-with open("item_7.json", "w") as json_file:
+with open("item_7_rich.json", "w") as json_file:
     json.dump(found_dict, json_file, indent=4)
 """
 print(count_not_found)
