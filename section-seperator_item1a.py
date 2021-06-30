@@ -1,9 +1,11 @@
 from bs4 import BeautifulSoup
 import re
+from numpy.core.arrayprint import _guarded_repr_or_str
 import pandas as pd
 import os
 import time
 import json
+from company_name import *
 
 documents = []
 count_not_found = 0
@@ -24,7 +26,7 @@ for root, dirs, files, in os.walk('2020/'):
         if file.endswith('.txt'):
             documents.append(os.path.join(root, file))
 
-for doc in range(0, 100):
+for doc in range(len(documents)):
     path = str(documents[doc])
 
     current_cik = os.listdir('2020/')
@@ -146,6 +148,10 @@ for doc in range(0, 100):
                                         print("----------------------")
                                         found_dict[uni_count] = {
                                             "CIK" : current_cik[doc],
+                                            "Company Name" : getCompanyName(documents[doc]),
+                                            "Item": "1A: Risk Factors",
+                                            "Primary Word" : primary_wordlist[p_word],
+                                            "Secondary Word" : secondary_wordlist[s_word],
                                             "before": before_found,
                                             "match" : found,
                                             "after" : after_found
@@ -156,6 +162,10 @@ for doc in range(0, 100):
                                         print("----------------------")
                                         found_dict[uni_count] = {
                                             "CIK" : current_cik[doc],
+                                            "Company Name" : getCompanyName(documents[doc]),
+                                            "Item": "1A: Risk Factors",
+                                            "Primary Word" : primary_wordlist[p_word],
+                                            "Secondary Word" : secondary_wordlist[s_word],
                                             "before": before_found,
                                             "match" : found,
                                         }
@@ -173,6 +183,10 @@ for doc in range(0, 100):
                                     uni_count +=1
                                     found_dict[uni_count] = {
                                             "CIK" : current_cik[doc],
+                                            "Company Name" : getCompanyName(documents[doc]),
+                                            "Item": "1A: Risk Factors",
+                                            "Primary Word" : primary_wordlist[p_word],
+                                            "Secondary Word" : secondary_wordlist[s_word],
                                             "match" : found,
                                             "after" : after_found
                                         }
@@ -193,7 +207,7 @@ for doc in range(0, 100):
     item_1a_paragraphs.clear()
     paragraphthere = False
 
-with open("item_1a.json", "w") as json_file:
+with open("item_1a_rich.json", "w") as json_file:
     json.dump(found_dict, json_file, indent=4)
 """
 print(count_not_found)
