@@ -1,9 +1,7 @@
 from bs4 import BeautifulSoup
 import re
-from numpy.core.arrayprint import _guarded_repr_or_str
 import pandas as pd
 import os
-import time
 import json
 from company_name import *
 
@@ -146,6 +144,7 @@ for doc in range(len(documents)):
                                         print("\tmatch: ",found, '\n\n')
                                         print("\tafter: ", after_found, '\n\n')
                                         print("----------------------")
+
                                         found_dict[uni_count] = {
                                             "CIK" : current_cik[doc],
                                             "Company Name" : getCompanyName(documents[doc]),
@@ -160,6 +159,7 @@ for doc in range(len(documents)):
                                         print("\tbefore: ",before_found, '\n\n')
                                         print("\tmatch: ",found, '\n\n')
                                         print("----------------------")
+
                                         found_dict[uni_count] = {
                                             "CIK" : current_cik[doc],
                                             "Company Name" : getCompanyName(documents[doc]),
@@ -181,6 +181,7 @@ for doc in range(len(documents)):
                                     print("\tafter: ",after_found, '\n\n')
                                     print("----------------------")
                                     uni_count +=1
+                                    
                                     found_dict[uni_count] = {
                                             "CIK" : current_cik[doc],
                                             "Company Name" : getCompanyName(documents[doc]),
