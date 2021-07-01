@@ -3,23 +3,28 @@ import re
 import pandas as pd
 import os
 import time
+import json
 
 documents = []
 count_not_found = 0
-primary_wordlist = ['COVID-19', 'pandemic']
-secondary_wordlist = ['supply chain']
+primary_wordlist = ['remote audit', 'external audit']
 regex = ""
 
 not_found = []
 foundcount = 1
 count = 0
+uni_count = 0
+
+found_dict = {}
+
+# This finds all of the files with the .txt extension and adds the name of the file to the list called "documents"
 for root, dirs, files, in os.walk('2020/'):
     for file in files:
         if file.endswith('.txt'):
             documents.append(os.path.join(root, file))
 
-for i in range(0, 3286):
-    path = str(documents[i])
+for doc in range(0, 3286):
+    path = str(documents[doc])
 
     current_cik = os.listdir('2020/')
 
@@ -37,24 +42,20 @@ for i in range(0, 3286):
 
         doc_types = [x[len('<TYPE>'):] for x in type_pattern.findall(raw_10k)]
 
-        document = {}
+        document = {} 
 
         # Create a loop to go through each section type and save only the 10-K section in the dictionary
         for doc_type, doc_start, doc_end in zip(doc_types, doc_start_is, doc_end_is):
             if doc_type == '10-K':
                 document[doc_type] = raw_10k[doc_start:doc_end]
-#(Item(\s|&#160;|&nbsp;)(1A|1B|7A|7|8)\.{0,1})|(ITEM(\s|&#160;|&nbsp;)(1A|1B|7A|7|8))|(item(\s|&#160;|&nbsp;)(1A|1B|7A|7|8))|(item(\s|&#160;|&nbsp;)(1A|2|7A|7|8))|(ITEM(\s|&#160;|&nbsp;)(1A|2|7A|7|8))|(Item(\s|&#160;|&nbsp;)(1A|2|7A|7|8))|
+
+        #Try to run this, if something happens, go to the next document but also increment the count for the amount of things not found
         try:
             regex = re.compile(r'((ITEM)|(Item)|(item))\s?(\&nbsp;)?(\d\w?)[.:-]\s?(\&nbsp;)?(\&nbsp;)?(\&nbsp;)?(\&nbsp;)?\s?(\w){0,4}')
 
             # Use finditer to math the regex
             matches = regex.finditer(document['10-K'])
 
-            # Write a for loop to print the matches 
-            '''
-            for match in matches:
-                print(match)
-            '''
 
             matches = regex.finditer(document['10-K'])
             # Create the dataframe
@@ -85,246 +86,48 @@ for i in range(0, 3286):
             pos_dat
             try:
                 item_1a_raw = document['10-K'][pos_dat['start'].loc['item1a']:pos_dat['start'].loc['item1b']]
-                item_7_raw = document['10-K'][pos_dat['start'].loc['item7']:pos_dat['start'].loc['item7a']]
-                item_7a_raw = document['10-K'][pos_dat['start'].loc['item7a']:pos_dat['start'].loc['item8']]
             except:
                 #print('cannot seperate sections')
-                pass
+                item_1a_raw.clear()
+                continue
             count+=1
             
-            item_1a_content = BeautifulSoup(item_1a_raw, 'lxml')
-            item_1a_paragraphs = item_1a_content.findAll('span')
-                
+            #Add all of the paragraphs to the item_1a_paragrpahs list
+            content = BeautifulSoup(raw_10k, 'lxml')
+            paragraphs = content.findAll('span')
+            #For every word in the range of the length of the list of "primary_word list" run the code underneath
+            for p_word in range(len(primary_wordlist)):
 
-            item_7_content = BeautifulSoup(item_7_raw, 'lxml')
-            item_7_paragraphs = item_7_content.findAll('span')
+                # For every line in the range of the length of the "item_1a_paragraphs" run the codfe underneath
+                for j in range(len(raw_10k)):
 
-            item_7a_content = BeautifulSoup(item_7a_raw, 'lxml')
-            item_7a_paragraphs = item_7a_content.findAll('span')
-
-
-            for x in range(len(primary_wordlist)):
-                for j in range(len(item_1a_paragraphs)):
-                    if primary_wordlist[x] in item_1a_paragraphs[j].get_text():
-
+                    # If an instance of a primary word is somewhere in the "item_1a_paragrpahs list", then run the code underneath
+                    if primary_wordlist[p_word] in paragraphs[j].get_text():
                         try:
-                            try:
-                                before_found = str(item_1a_paragraphs[j-1].get_text())
-                                while len(before_found) <= 2:
-                                    foundcount +=1
-                                    before_found = str(item_1a_paragraphs[j-foundcount].get_text())
+                            found = str(paragraphs[j].get_text())
 
-                                after_found = str(item_1a_paragraphs[j+1].get_text())
-                                while len(after_found) <= 2:
-                                    foundcount +=1
-                                    after_found = str(item_1a_paragraphs[j-foundcount].get_text())
 
-                                for s_word in range(len(secondary_wordlist)):
-                                    if secondary_wordlist[s_word] in before_found:
-                                        print("CIK: ", current_cik[i])
-                                        print('PRIMARY WORD: ', primary_wordlist[x])
-                                        print('SECONDARY WORD: ', secondary_wordlist[s_word])
-                                        print('++++++++++ITEM 1A: Risk Factors++++++++++', '\n\n')
-                                        print("\tbefore: ",before_found, '\n\n')
-
-                                        found = str(item_1a_paragraphs[j].get_text())
-                                        print("\tmatch: ",found, '\n\n')
-                                        
-                                        if secondary_wordlist[s_word] in after_found:
-                                            print("\tafter: ", after_found, '\n\n')
-                                        else:
-                                            print("----------------------")
-                                        
-                                    elif secondary_wordlist[s_word] in after_found:
-                                        found = str(item_1a_paragraphs[j].get_text())
-                                        print("CIK: ", current_cik[i])
-                                        print('PRIMARY WORD: ', primary_wordlist[x])
-                                        print('SECONDARY WORD: ', secondary_wordlist[s_word])
-                                        print('++++++++++ITEM 1A: Risk Factors++++++++++', '\n\n')
-                                        print("\tmatch: ",found, '\n\n')
-
-                                        print("\tafter: ",after_found, '\n\n')
-
-                                        if secondary_wordlist[s_word] in before_found:
-                                            print("\tafter: ", before_found, '\n\n')
-                                        else:
-                                            print("----------------------")
-                            except:
-                                pass
-                            '''
-                            try:
-                                after_found = str(item_1a_paragraphs[j+1].get_text())
-                                while len(after_found) <= 2:
-                                    foundcount +=1
-                                    after_found = str(item_1a_paragraphs[j-foundcount].get_text())
-                                for s_word2 in range(len(secondary_wordlist)):
-                                    if secondary_wordlist[s_word2] in after_found:
-
-                                        found = str(item_1a_paragraphs[j].get_text())
-                                        print("CIK: ", current_cik[i])
-                                        print('PRIMARY WORD: ', primary_wordlist[x])
-                                        print('SECONDARY WORD: ', secondary_wordlist[s_word])
-                                        print('++++++++++ITEM 1A: Risk Factors++++++++++')
-                                        print("\tmatch: ",found, '\n\n')
-
-                                        print("\tafter: ",after_found, '\n\n')
-                                        print("----------------------")
-
-                                    else:
-                                        pass
-                            except:
-                                pass
-                            
-                            try:
-                                before_found = str(item_1a_paragraphs[j-1].get_text())
-                                while len(before_found) <= 2:
-                                    foundcount +=1
-                                    before_found = str(item_1a_paragraphs[j-foundcount].get_text())
-
-                                after_found = str(item_1a_paragraphs[j+1].get_text())
-                                while len(after_found) <= 2:
-                                    foundcount +=1
-                                    after_found = str(item_1a_paragraphs[j-foundcount].get_text())
+                            print("CIK: ", current_cik[doc])
+                            print('PRIMARY WORD: ', primary_wordlist[p_word])
+                            print('++++++++++ITEM 1A: Risk Factors++++++++++', '\n\n')
+                            print("\tmatch: ",found, '\n\n')
+                            print("----------------------")
                                 
-                                for s_word in range(len(secondary_wordlist)):
-                                    if secondary_wordlist[s_word] in before_found and secondary_wordlist[s_word] in after_found:
-                                        print("CIK: ", current_cik[i])
-                                        print('PRIMARY WORD: ', primary_wordlist[x])
-                                        print('SECONDARY WORD: ', secondary_wordlist[s_word])
-                                        print('++++++++++ITEM 1A: Risk Factors++++++++++')
-                                        print("\tbefore: ",before_found, '\n\n')
-
-                                        found = str(item_1a_paragraphs[j].get_text())
-                                        print("\tmatch: ",found, '\n\n')
-                                        print("\tafter: ",after_found, '\n\n')
-                                        print("----------------------")
-                                        
-                                    else:
-                                        pass
-                            except:
-                                pass
-                            '''
-                        except:
+                        except: 
                             pass
-            item_1a_paragraphs.clear()
-            #item_7_paragraphs.clear()
-            #item_7a_paragraphs.clear()
-
         except:
-            not_found.append(current_cik[i])
-            #print(current_cik[i])
+            not_found.append(current_cik[doc])
+            #print(current_cik[doc])
             #print("Cannot find any sections, moving on to the next document...")
             count_not_found += 1
-            pass
+            continue
+    # Clear the paragraphs list so that we dont keep appending new data to it without removing the last documents paragraphs
+    paragraphs.clear()
+    paragraphthere = False
 
+with open("remote_audit.json", "w") as json_file:
+    json.dump(found_dict, json_file, indent=4)
+"""
 print(count_not_found)
-print(not_found)
-'''
-                        try:
-                            after_found = str(item_1a_paragraphs[j+1].get_text())
-                            while len(after_found) <= 2:
-                                foundcount +=1
-                                after_found = str(item_1a_paragraphs[j-foundcount].get_text())
-                            for s_word2 in range(len(secondary_wordlist)):
-                                if secondary_wordlist[s_word2] in after_found:
-
-                                    found = str(item_1a_paragraphs[j].get_text())
-                                    print("CIK: ", current_cik[i])
-                                    print('PRIMARY WORD: ', primary_wordlist[x])
-                                    print('SECONDARY WORD: ', secondary_wordlist[s_word])
-                                    print('++++++++++ITEM 1A: Risk Factors++++++++++')
-                                    print("\tmatch: ",found, '\n\n')
-
-                                    print("\tafter: ",after_found, '\n\n')
-                                    print("----------------------")
-
-                                else:
-                                    after_found = ''
-                                    pass
-                        except:
-                            pass
-'''
-
-'''
-                for k in range(len(item_7_paragraphs)):
-
-                    if primary_wordlist[x] in item_7_paragraphs[k].get_text():
-                        try:
-                            print('++++++++++ITEM 7: Management’s Discussion and Analysis of Financial Condition and Results of Operations++++++++++')
-                            before_found = str(item_7_paragraphs[k-1].get_text())
-                            while len(before_found) <= 2:
-                                foundcount +=1
-                                before_found = str(item_7_paragraphs[k-foundcount].get_text())
-                            print("\tbefore: ",before_found, '\n\n')
-                        except:
-                            print("\tbefore: NONE")
-                            pass
-
-                        try:
-                            found = str(item_7_paragraphs[k].get_text())
-                            print("match: ",found, '\n\n')
-                        except:
-                            print("\tmatch: NONE")
-                            pass
-
-                        try:
-                            after_found = str(item_7_paragraphs[k+1].get_text())
-                            while len(after_found) <= 2:
-                                foundcount +=1
-                                after_found = str(item_7_paragraphs[k-foundcount].get_text())
-                            print("\tafter: ",after_found, len(after_found))
-                        except:
-                            print("\tafter: NONE")
-                            pass
-
-                        print("----------------------")
-
-                for l in range(len(item_7a_paragraphs)):
-                    if primary_wordlist[x] in item_7a_paragraphs[l].get_text():
-                        try:
-                            print('++++++++++ITEM 7A: Quantitative and Qualitative Disclosures about Market Risk++++++++++')
-                            before_found = str(item_7a_paragraphs[l-1].get_text())
-                            while len(before_found) <= 2:
-                                foundcount +=1
-                                before_found = str(item_7a_paragraphs[l-foundcount].get_text())
-
-                            print("\tbefore: ",before_found, '\n')
-                        except:
-                            print("\tbefore: NONE")
-                            pass
-
-                        try:
-                            found = str(item_7a_paragraphs[l].get_text())
-                            print("\tmatch: ",found, '\n')
-                        except:
-                            print("\tmatch: NONE")
-                            pass
-
-                        try:
-                            after_found = str(item_7a_paragraphs[l+1].get_text())
-                            while len(after_found) <= 2:
-                                foundcount +=1
-                                after_found = str(item_7a_paragraphs[l-foundcount].get_text())
-                            print("\tafter: ",after_found, len(after_found))
-                        except:
-                            print("\tafter: NONE")
-                            pass
-
-                        print("----------------------")
-'''
-'''
-            item_1a_paragraphs.clear()
-            #item_7_paragraphs.clear()
-            #item_7a_paragraphs.clear()
-
-        except:
-            not_found.append(current_cik[i])
-            #print(current_cik[i])
-            #print("Cannot find any sections, moving on to the next document...")
-            count_not_found += 1
-            pass
-
-print(count_not_found)
-print(not_found)
-'''
-
+print((len(documents)-len(not_found))/len(documents))
+print(not_found)"""
