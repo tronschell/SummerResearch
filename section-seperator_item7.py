@@ -7,8 +7,8 @@ from company_name import *
 
 documents = []
 count_not_found = 0
-primary_wordlist = ['COVID-19', 'pandemic']
-secondary_wordlist = ['supply chain', 'operational disruption', 'logistics network', 'outsourcing']
+primary_wordlist = ['COVID-19']
+secondary_wordlist = ['supply chain', 'operational disruption', 'logistics network', 'outsourcing', 'adverse impact', 'adversely impacted']
 regex = ""
 
 not_found = []

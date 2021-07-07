@@ -11,14 +11,17 @@ primary_wordlist = ['COVID-19']
 not_found = []
 foundcount = 1
 uni_count = 0
+count = 0
 
 found_dict = {}
 
+class StopLookingForThings(Exception): pass
+
 # This finds all of the files with the .txt extension and adds the name of the file to the list called "documents"
-for root, dirs, files, in os.walk('2020'):
+for root, dirs, files, in os.walk('sec-edgar-filings'):
     dirs.sort()
     for file in files:
-        if file.endswith('.txt'):
+        if file.endswith('.html'):
             documents.append(os.path.join(root, file))
 
 print(documents)
@@ -26,11 +29,13 @@ print(documents)
 for doc in range(len(documents)):
     path = str(documents[doc])
 
+    count = 0
+
     current_cik = os.listdir('2020/')
 
-    with open(path, 'r') as f:
+    with open(path ,encoding = 'utf-8') as f:
 
-        raw_10k = f.read()
+        raw_10k = f.read() 
 
         #Try to run this, if something happens, go to the next document but also increment the count for the amount of things not found
         try:
@@ -48,6 +53,13 @@ for doc in range(len(documents)):
                     # If an instance of a primary word is somewhere in the "item_1a_paragrpahs list", then run the code underneath
                     if primary_wordlist[p_word] in doc_paragraphs[j].get_text():
                         try:
+
+                            if count == 1:
+                                break
+                            else:
+                                pass
+
+                            count = 1
                             found = str(doc_paragraphs[j].get_text())
 
                             # before_found is the instance before the position the primary word was found in, so in that case -1 the index
@@ -86,7 +98,7 @@ for doc in range(len(documents)):
                                 "match" : found,
                                 "after" : after_found
                             }
-                            continue
+                            
                         except:
                             pass
         except:
@@ -94,11 +106,13 @@ for doc in range(len(documents)):
             #print(current_cik[doc])
             print("Cannot find anything, moving on to the next document...")
             #count_not_found += 1
+            count = 0
             continue
+            
     # Clear the paragraphs list so that we dont keep appending new data to it without removing the last documents paragraphs
     doc_paragraphs.clear()
 
-with open("1_paragraph_entire_doc_rich.json", "w") as json_file:
+with open("1_keyword_entire_doc_rich_v2_span.json", "w") as json_file:
     json.dump(found_dict, json_file, indent=4)
 """
 print(count_not_found)

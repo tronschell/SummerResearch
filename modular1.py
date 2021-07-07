@@ -1,11 +1,9 @@
 from company_name import *
 
-def find_paragraphs(p_wordlist, s_wordlist, full_paragraphs, current_cik, documents, doc, section):
-    foundcount, unicount = 0
-    found_dict = {}
+def find_paragraphs(p_wordlist, s_wordlist, full_paragraphs, current_cik, documents, doc, section, unicount, found_dict):
+    foundcount = 0
     if section.lower == "item 7":
         for p_word in range(len(p_wordlist)):
-
                     # For every line in the range of the length of the "full_paragraphs" run the codfe underneath
                     for j in range(len(full_paragraphs)):
 
@@ -100,7 +98,7 @@ def find_paragraphs(p_wordlist, s_wordlist, full_paragraphs, current_cik, docume
                                         pass      
                             except:
                                 pass
-                            return found_dict[unicount]
+                            return current_cik[doc], found, after_found
 
     elif section.lower == "item 1a":
         for p_word in range(len(p_wordlist)):
