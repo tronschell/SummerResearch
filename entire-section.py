@@ -55,37 +55,61 @@ for doc in range(int(len(documents)/200)):
 
                 # If an instance of a primary word is somewhere in the "item_1a_paragrpahs list", then run the code underneath
                 if primary_wordlist[p_word] in doc_paragraphs[j].get_text():
-                    try:
-                        found = str(doc_paragraphs[j].get_text())
 
-                        # before_found is the instance before the position the primary word was found in, so in that case -1 the index
-                        before_found = str(doc_paragraphs[j-1].get_text())
-                        while len(before_found) <= 2:
-                            foundcount +=1
-                            before_found = str(doc_paragraphs[j-foundcount].get_text())
+                    found = str(doc_paragraphs[j].get_text())
 
-                        # after_found is the instance after the position the primary word was found in, so in that case  +1 the index
-                        after_found = str(doc_paragraphs[j+1].get_text())
+                    # before_found is the instance before the position the primary word was found in, so in that case -1 the index
+                    before_found = str(doc_paragraphs[j-1].get_text())
+                    while len(before_found) <= 2:
+                        foundcount +=1
+                        before_found = str(doc_paragraphs[j-foundcount].get_text())
 
-                        # If the length of the after found paragrpah is less than or equal to 2 characters it is most likely a space, number, or bullet point. In that case, skip it by incrementint
-                        while len(after_found) <= 2:
-                            foundcount +=1
-                            after_found = str(doc_paragraphs[j+foundcount].get_text())
-                        uni_count +=1
+                    # after_found is the instance after the position the primary word was found in, so in that case  +1 the index
+                    after_found = str(doc_paragraphs[j+1].get_text())
 
-                        #For every secondary word in the secondary word list, run the code below
-                        for s_word in range(len(secondary_wordlist)):  
+                    # If the length of the after found paragrpah is less than or equal to 2 characters it is most likely a space, number, or bullet point. In that case, skip it by incrementint
+                    while len(after_found) <= 2:
+                        foundcount +=1
+                        after_found = str(doc_paragraphs[j+foundcount].get_text())
+                    uni_count +=1
 
-                            if secondary_wordlist[s_word] in after_found and secondary_wordlist[s_word] in before_found:
-                                '''print("CIK: ", current_cik[doc])
-                                print('PRIMARY WORD: ', primary_wordlist[p_word])
-                                print('SECONDARY WORD:', secondary_wordlist[s_word])
-                                print('ENTIRE DOCUMENT', '\n\n')
-                                print("\tmatch: ",found, '\n\n')
-                                print("\tafter: ",after_found, '\n\n')
-                                print("----------------------")'''
+                    #For every secondary word in the secondary word list, run the code below
+                    for s_word in range(len(secondary_wordlist)):  
 
-                                found_dict = {
+                        if secondary_wordlist[s_word] in after_found and secondary_wordlist[s_word] in before_found:
+                            '''print("CIK: ", current_cik[doc])
+                            print('PRIMARY WORD: ', primary_wordlist[p_word])
+                            print('SECONDARY WORD:', secondary_wordlist[s_word])
+                            print('ENTIRE DOCUMENT', '\n\n')
+                            print("\tmatch: ",found, '\n\n')
+                            print("\tafter: ",after_found, '\n\n')
+                            print("----------------------")'''
+
+                            found_dict = {
+                                "CIK" : current_cik[doc],
+                                "Company Name" : getCompanyName(documents[doc]),
+                                "Item": 'Entire Document',
+                                "Primary Word" : primary_wordlist[p_word],
+                                "Secondary Word" : secondary_wordlist[s_word],
+                                "before": before_found,
+                                "match" : found,
+                                "after" : after_found
+                            } 
+                            print('appended to list')
+                            found_lst.append(found_dict.copy())
+
+                        # If there is a secondary word in the before paragraph, then run the code underneath
+                        elif secondary_wordlist[s_word] in before_found:
+                            '''print("CIK: ", current_cik[doc])
+                            print('PRIMARY WORD: ', primary_wordlist[p_word])
+                            print('SECONDARY WORD:', secondary_wordlist[s_word])
+                            print('ENTIRE DOCUMENT', '\n\n')
+
+                            print("\tbefore: ",before_found, '\n\n')
+                            print("\tmatch: ",found, '\n\n')
+                            print("----------------------")'''
+
+                            found_dict = {
                                     "CIK" : current_cik[doc],
                                     "Company Name" : getCompanyName(documents[doc]),
                                     "Item": 'Entire Document',
@@ -93,63 +117,36 @@ for doc in range(int(len(documents)/200)):
                                     "Secondary Word" : secondary_wordlist[s_word],
                                     "before": before_found,
                                     "match" : found,
-                                    "after" : after_found
-                                } 
-                                print('appended to list')
-                                found_lst.append(found_dict.copy())
-
-                            # If there is a secondary word in the before paragraph, then run the code underneath
-                            elif secondary_wordlist[s_word] in before_found:
-                                '''print("CIK: ", current_cik[doc])
-                                print('PRIMARY WORD: ', primary_wordlist[p_word])
-                                print('SECONDARY WORD:', secondary_wordlist[s_word])
-                                print('ENTIRE DOCUMENT', '\n\n')
-
-                                print("\tbefore: ",before_found, '\n\n')
-                                print("\tmatch: ",found, '\n\n')
-                                print("----------------------")'''
-
-                                found_dict = {
-                                        "CIK" : current_cik[doc],
-                                        "Company Name" : getCompanyName(documents[doc]),
-                                        "Item": 'Entire Document',
-                                        "Primary Word" : primary_wordlist[p_word],
-                                        "Secondary Word" : secondary_wordlist[s_word],
-                                        "before": before_found,
-                                        "match" : found,
-                                        "after" : 'NONE'
-                                    }
-                                print('appended to list')
-                                found_lst.append(found_dict.copy())
+                                    "after" : 'NONE'
+                                }
+                            print('appended to list')
+                            found_lst.append(found_dict.copy())
 
 
 
-                            # Else if there is a secondary word in the after found paragraph, then run the code underneath
-                            elif secondary_wordlist[s_word] in after_found:
-                                '''print("CIK: ", current_cik[doc])
-                                print('PRIMARY WORD: ', primary_wordlist[p_word])
-                                print('SECONDARY WORD:', secondary_wordlist[s_word])
-                                print('ENTIRE DOCUMENT', '\n\n')
-                                print("\tmatch: ",found, '\n\n')
-                                print("\tafter: ",after_found, '\n\n')
-                                print("----------------------")'''
+                        # Else if there is a secondary word in the after found paragraph, then run the code underneath
+                        elif secondary_wordlist[s_word] in after_found:
+                            '''print("CIK: ", current_cik[doc])
+                            print('PRIMARY WORD: ', primary_wordlist[p_word])
+                            print('SECONDARY WORD:', secondary_wordlist[s_word])
+                            print('ENTIRE DOCUMENT', '\n\n')
+                            print("\tmatch: ",found, '\n\n')
+                            print("\tafter: ",after_found, '\n\n')
+                            print("----------------------")'''
 
-                                found_dict = {"CIK" : current_cik[doc],
-                                        "Company Name" : getCompanyName(documents[doc]),
-                                        "Item": 'Entire Document',
-                                        "Primary Word" : primary_wordlist[p_word],
-                                        "Secondary Word" : secondary_wordlist[s_word],
-                                        "before": 'NONE',
-                                        "match" : found,
-                                        "after" : after_found}
-                                print('appended to list')
-                                found_lst.append(found_dict.copy())
+                            found_dict = {"CIK" : current_cik[doc],
+                                    "Company Name" : getCompanyName(documents[doc]),
+                                    "Item": 'Entire Document',
+                                    "Primary Word" : primary_wordlist[p_word],
+                                    "Secondary Word" : secondary_wordlist[s_word],
+                                    "before": 'NONE',
+                                    "match" : found,
+                                    "after" : after_found}
+                            print('appended to list')
+                            found_lst.append(found_dict.copy())
 
-                            else:
-                                pass
-
-                    except:
-                        pass
+                        else:
+                            pass
                 else:
                     continue
 
