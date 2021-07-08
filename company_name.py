@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 def getCompanyName(CIK):
     documents = []
 
-    for root, dirs, files, in os.walk('2020/'):
+    for root, dirs, files, in os.walk('sec-edgar-filings'):
         for file in files:
             if file.endswith('.txt'):
                 documents.append(os.path.join(root, file))
