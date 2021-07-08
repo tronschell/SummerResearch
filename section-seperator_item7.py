@@ -19,7 +19,7 @@ uni_count = 0
 found_dict = {}
 
 # This finds all of the files with the .txt extension and adds the name of the file to the list called "documents"
-for root, dirs, files, in os.walk('2020/'):
+for root, dirs, files, in os.walk('sec-edgar-filings'):
     for file in files:
         if file.endswith('.txt'):
             documents.append(os.path.join(root, file))
@@ -27,7 +27,7 @@ for root, dirs, files, in os.walk('2020/'):
 for doc in range(len(documents)):
     path = str(documents[doc])
 
-    current_cik = os.listdir('2020/')
+    current_cik = os.listdir('sec-edgar-filings')
 
     with open(path, 'r') as f:
 
@@ -202,7 +202,7 @@ for doc in range(len(documents)):
     # Clear the paragraphs list so that we dont keep appending new data to it without removing the last documents paragraphs
     item_7_paragraphs.clear()
 
-with open("item_7_rich.json", "w") as json_file:
+with open("item_7_span.json", "w") as json_file:
     json.dump(found_dict, json_file, indent=4)
 """
 print(count_not_found)
