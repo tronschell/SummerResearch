@@ -20,7 +20,6 @@ secondary_wordlist = ['supply chain']
 
 not_found = []
 foundcount = 1
-uni_count = 0
 
 found_lst = []
 
@@ -31,7 +30,7 @@ for root, dirs, files, in os.walk('sec-edgar-filings'):
             documents.append(os.path.join(root, file))
 
 
-for doc in range(int(len(documents)/200)):
+for doc in range(int(len(documents))):
     path = str(documents[doc])
 
     current_cik = os.listdir('sec-edgar-filings')
@@ -59,19 +58,25 @@ for doc in range(int(len(documents)/200)):
                     found = str(doc_paragraphs[j].get_text())
 
                     # before_found is the instance before the position the primary word was found in, so in that case -1 the index
-                    before_found = str(doc_paragraphs[j-1].get_text())
-                    while len(before_found) <= 2:
-                        foundcount +=1
-                        before_found = str(doc_paragraphs[j-foundcount].get_text())
+                    try:
+                        before_found = str(doc_paragraphs[j-1].get_text())
+                        while len(before_found) <= 2:
+                            foundcount +=1
+                            before_found = str(doc_paragraphs[j-foundcount].get_text())
+                    except:
+                        before_found='None'
 
                     # after_found is the instance after the position the primary word was found in, so in that case  +1 the index
-                    after_found = str(doc_paragraphs[j+1].get_text())
+                    try:
+                        after_found = str(doc_paragraphs[j+1].get_text())
+                    
 
                     # If the length of the after found paragrpah is less than or equal to 2 characters it is most likely a space, number, or bullet point. In that case, skip it by incrementint
-                    while len(after_found) <= 2:
-                        foundcount +=1
-                        after_found = str(doc_paragraphs[j+foundcount].get_text())
-                    uni_count +=1
+                        while len(after_found) <= 2:
+                            foundcount +=1
+                            after_found = str(doc_paragraphs[j+foundcount].get_text())
+                    except:
+                        after_found = 'None'
 
                     #For every secondary word in the secondary word list, run the code below
                     for s_word in range(len(secondary_wordlist)):  
@@ -116,13 +121,10 @@ for doc in range(int(len(documents)/200)):
                                     "Primary Word" : primary_wordlist[p_word],
                                     "Secondary Word" : secondary_wordlist[s_word],
                                     "before": before_found,
-                                    "match" : found,
-                                    "after" : 'NONE'
+                                    "match" : found
                                 }
                             print('appended to list')
                             found_lst.append(found_dict.copy())
-
-
 
                         # Else if there is a secondary word in the after found paragraph, then run the code underneath
                         elif secondary_wordlist[s_word] in after_found:
@@ -139,7 +141,6 @@ for doc in range(int(len(documents)/200)):
                                     "Item": 'Entire Document',
                                     "Primary Word" : primary_wordlist[p_word],
                                     "Secondary Word" : secondary_wordlist[s_word],
-                                    "before": 'NONE',
                                     "match" : found,
                                     "after" : after_found}
                             print('appended to list')
@@ -152,6 +153,10 @@ for doc in range(int(len(documents)/200)):
 
 print(found_lst)
 
+ids = collection.insert_many(found_lst)
+print('added', ids)
+
 
 print((len(documents)-len(not_found))/len(documents))
 print(not_found)
+ 
