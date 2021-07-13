@@ -10,10 +10,14 @@ def getCompanyName(CIK):
             if file.endswith('.txt'):
                 documents.append(os.path.join(root, file))
 
-    with open(str(CIK), 'r') as f:
+    with open(str(CIK), 'r', encoding='utf-8') as f:
         raw = f.read()
         soup = BeautifulSoup(raw, 'lxml')
-        CName = soup.find('ix:nonnumeric',{'name':'dei:EntityRegistrantName'})
-        return CName.getText()
+        try:
+            CName = soup.find('ix:nonnumeric',{'name':'dei:EntityRegistrantName'}).getText()
+            return CName
+        except:
+            CName = 'NONE'
+            return CName
 
         

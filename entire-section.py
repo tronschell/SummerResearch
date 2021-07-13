@@ -7,7 +7,7 @@ from pymongo import MongoClient
 try:
     client = MongoClient('localhost', 27017)
     database = client['CovidResearch']
-    collection = database['entire_doc_p']
+    collection = database['entire_doc_employee']
     print("Connected successfully!!!")
 except:
     print("Could not connect to MongoDB")
@@ -16,7 +16,7 @@ except:
 documents = []
 #count_not_found = 0
 primary_wordlist = ['COVID-19']
-secondary_wordlist = ['supply chain']
+secondary_wordlist = ['employee', 'furlough', 'furloughed']
 
 not_found = []
 foundcount = 1
@@ -45,7 +45,25 @@ for doc in range(int(len(documents))):
         print('Checking number', doc, 'out of', len(documents))
         #Add all of the paragraphs to the item_1a_paragrpahs list
         doc_content = BeautifulSoup(raw_10k, 'lxml')
-        doc_paragraphs = doc_content.findAll('p')
+
+        #This block of code finds the tag with the most amount of information inside of it and makes it the primary tag for finding things
+        #This was made instead of having different tables/collections for different tags
+        p_doc_paragraphs = doc_content.findAll('p')
+        span_doc_paragraphs = doc_content.findAll('span')
+        font_doc_paragraphs = doc_content.findAll('font')
+
+        if (len(p_doc_paragraphs) > len(span_doc_paragraphs)) and (len(p_doc_paragraphs) > len(font_doc_paragraphs)):
+            print('using p doc paragraphs')
+            doc_paragraphs = p_doc_paragraphs
+            tags = 'p'
+        elif (len(span_doc_paragraphs) > len(p_doc_paragraphs)) and (len(span_doc_paragraphs) > len(font_doc_paragraphs)):
+            print('using span paragraphs')
+            doc_paragraphs = span_doc_paragraphs
+            tags = 'span'
+        else:
+            doc_paragraphs = font_doc_paragraphs
+            tags = 'font'
+
         #For every word in the range of the length of the list of "primary_word list" run the code underneath
         for p_word in range(len(primary_wordlist)):
 
@@ -64,13 +82,11 @@ for doc in range(int(len(documents))):
                             foundcount +=1
                             before_found = str(doc_paragraphs[j-foundcount].get_text())
                     except:
-                        before_found='None'
+                        before_found = 'None'
 
                     # after_found is the instance after the position the primary word was found in, so in that case  +1 the index
                     try:
                         after_found = str(doc_paragraphs[j+1].get_text())
-                    
-
                     # If the length of the after found paragrpah is less than or equal to 2 characters it is most likely a space, number, or bullet point. In that case, skip it by incrementint
                         while len(after_found) <= 2:
                             foundcount +=1
@@ -81,7 +97,30 @@ for doc in range(int(len(documents))):
                     #For every secondary word in the secondary word list, run the code below
                     for s_word in range(len(secondary_wordlist)):  
 
-                        if secondary_wordlist[s_word] in after_found and secondary_wordlist[s_word] in before_found:
+                        if secondary_wordlist[s_word] in found:
+                            '''print("CIK: ", current_cik[doc])
+                            print('PRIMARY WORD: ', primary_wordlist[p_word])
+                            print('SECONDARY WORD:', secondary_wordlist[s_word])
+                            print('ENTIRE DOCUMENT', '\n\n')
+
+                            print("\tbefore: ",before_found, '\n\n')
+                            print("\tmatch: ",found, '\n\n')
+                            print("----------------------")'''
+
+                            found_dict = {
+                                    "CIK" : current_cik[doc],
+                                    "Company Name" : getCompanyName(documents[doc]),
+                                    "Item": 'Entire Document',
+                                    "Primary Word" : primary_wordlist[p_word],
+                                    "Secondary Word" : secondary_wordlist[s_word],
+                                    "Tag": tags,
+                                    "match" : found
+                                }
+                            print('added to database')
+                            ids = collection.insert_one(found_dict)
+                            print('added', ids)
+
+                        elif secondary_wordlist[s_word] in after_found and secondary_wordlist[s_word] in before_found:
                             '''print("CIK: ", current_cik[doc])
                             print('PRIMARY WORD: ', primary_wordlist[p_word])
                             print('SECONDARY WORD:', secondary_wordlist[s_word])
@@ -96,12 +135,14 @@ for doc in range(int(len(documents))):
                                 "Item": 'Entire Document',
                                 "Primary Word" : primary_wordlist[p_word],
                                 "Secondary Word" : secondary_wordlist[s_word],
+                                "Tag": tags,
                                 "before": before_found,
                                 "match" : found,
                                 "after" : after_found
                             } 
-                            print('appended to list')
-                            found_lst.append(found_dict.copy())
+                            print('added to database')
+                            ids = collection.insert_one(found_dict)
+                            print('added', ids)
 
                         # If there is a secondary word in the before paragraph, then run the code underneath
                         elif secondary_wordlist[s_word] in before_found:
@@ -120,11 +161,13 @@ for doc in range(int(len(documents))):
                                     "Item": 'Entire Document',
                                     "Primary Word" : primary_wordlist[p_word],
                                     "Secondary Word" : secondary_wordlist[s_word],
+                                    "Tag": tags,
                                     "before": before_found,
                                     "match" : found
                                 }
-                            print('appended to list')
-                            found_lst.append(found_dict.copy())
+                            print('added to database')
+                            ids = collection.insert_one(found_dict)
+                            print('added', ids)
 
                         # Else if there is a secondary word in the after found paragraph, then run the code underneath
                         elif secondary_wordlist[s_word] in after_found:
@@ -141,22 +184,15 @@ for doc in range(int(len(documents))):
                                     "Item": 'Entire Document',
                                     "Primary Word" : primary_wordlist[p_word],
                                     "Secondary Word" : secondary_wordlist[s_word],
+                                    "Tag": tags,
                                     "match" : found,
                                     "after" : after_found}
-                            print('appended to list')
-                            found_lst.append(found_dict.copy())
+                            print('added to database')
+                            ids = collection.insert_one(found_dict)
+                            print('added', ids)
 
                         else:
                             pass
                 else:
                     continue
 
-print(found_lst)
-
-ids = collection.insert_many(found_lst)
-print('added', ids)
-
-
-print((len(documents)-len(not_found))/len(documents))
-print(not_found)
- 
