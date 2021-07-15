@@ -2,7 +2,7 @@ import re
 import pandas as pd
 from bs4 import BeautifulSoup
 
-def section_finder(document, section):
+def section_finder(document, section, tag):
     regex = re.compile(r'((ITEM)|(Item)|(item))\s?(\&nbsp;)?(\d\w?)[.:-]\s?(\&nbsp;)?(\&nbsp;)?(\&nbsp;)?(\&nbsp;)?\s?(\w){0,4}')
 
     # Use finditer to math the regex
@@ -32,11 +32,11 @@ def section_finder(document, section):
     if section.lower() == "item 7":
         item_7_raw = document['10-K'][pos_dat['start'].loc['item7']:pos_dat['start'].loc['item7a']]
         item_7_content = BeautifulSoup(item_7_raw, 'lxml')
-        item_7_paragraphs = item_7_content.findAll('span')
+        item_7_paragraphs = item_7_content.findAll(str(tag))
         return item_7_paragraphs
         
     elif section.lower() == "item 1a":
         item_1a_raw = document['10-K'][pos_dat['start'].loc['item1a']:pos_dat['start'].loc['item1b']]
         item_1a_content = BeautifulSoup(item_1a_raw, 'lxml')
-        item_1a_paragraphs = item_1a_content.findAll('span')
+        item_1a_paragraphs = item_1a_content.findAll(str(tag))
         return item_1a_paragraphs

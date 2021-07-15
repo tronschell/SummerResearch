@@ -5,18 +5,21 @@ from company_name import *
 from pymongo import MongoClient
 
 try:
-    client = MongoClient('localhost', 27017)
-    database = client['CovidResearch']
+    cluster = MongoClient("mongodb+srv://tron-schell:Aurf7046@covidresearch0.d3ctd.mongodb.net/myFirstDatabase?retryWrites=true&w=majority", serverSelectionTimeoutMS=5000)
+    database = cluster['CovidResearch']
     collection = database['entire_doc_employee']
     print("Connected successfully!!!")
 except:
     print("Could not connect to MongoDB")
 
 
+#db.entire_doc_employee('CIK', {$or: [{'Secondary Word':"laid off"}, {'Secondary Word':"layoffs"}, {'Secondary Word':"layoff", {'Secondary Word':"furlough"}, {'Secondary Word':"furloughs"}})
+
+
 documents = []
 #count_not_found = 0
 primary_wordlist = ['COVID-19']
-secondary_wordlist = ['employee', 'furlough', 'furloughed']
+secondary_wordlist = ['layoff', 'layoffs', 'laid off']
 
 not_found = []
 foundcount = 1
