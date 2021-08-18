@@ -4,13 +4,13 @@ import json
 from company_name import *
 from pymongo import MongoClient
 
-try:
+'''try:
     client = MongoClient('localhost', 27017)
     database = client['CovidResearch']
     collection = database['entire_doc_test']
     print("Connected successfully!!!")
 except:
-    print("Could not connect to MongoDB")
+    print("Could not connect to MongoDB")'''
 
 documents = []
 #count_not_found = 0
@@ -63,54 +63,64 @@ for doc in range(len(documents)):
         else:
             doc_paragraphs = font_doc_paragraphs
             tags = 'font'
+        try:
+            #For every word in the range of the length of the list of "primary_word list" run the code underneath
+            for p_word in range(len(primary_wordlist)):
+                run_count = 0
+                # For every line in the range of the length of the "doc_paragraphs" run the code underneath
+                for j in range(len(doc_paragraphs)):
 
-        #For every word in the range of the length of the list of "primary_word list" run the code underneath
-        for p_word in range(len(primary_wordlist)):
-            run_count = 0
-            # For every line in the range of the length of the "doc_paragraphs" run the code underneath
-            for j in range(len(doc_paragraphs)):
+                    # If an instance of a primary word is somewhere in the "item_1a_paragrpahs list", then run the code underneath
+                    if primary_wordlist[p_word] in doc_paragraphs[j].get_text():
+                        if run_count == 1:
+                            continue
+                        else:
+                            pass
 
-                # If an instance of a primary word is somewhere in the "item_1a_paragrpahs list", then run the code underneath
-                if primary_wordlist[p_word] in doc_paragraphs[j].get_text():
-
-                    found = str(doc_paragraphs[j].get_text())
-                    run_count += 1
-                    print(run_count)
-                    #print(found)
+                        found = str(doc_paragraphs[j].get_text())
+                        run_count += 1
+                        print(run_count)
+                        #print(found)
 
 
-                    # before_found is the instance before the position the primary word was found in, so in that case -1 the index
-                    try:
-                        before_found = str(doc_paragraphs[j-1].get_text())
-                        while len(before_found) <= 2:
-                            foundcount +=1
-                            before_found = str(doc_paragraphs[j-foundcount].get_text())
-                    except:
-                        before_found='None'
+                        # before_found is the instance before the position the primary word was found in, so in that case -1 the index
+                        try:
+                            before_found = str(doc_paragraphs[j-1].get_text())
+                            while len(before_found) <= 2:
+                                foundcount +=1
+                                before_found = str(doc_paragraphs[j-foundcount].get_text())
+                        except:
+                            before_found='None'
 
-                    # after_found is the instance after the position the primary word was found in, so in that case  +1 the index
-                    try:
-                        after_found = str(doc_paragraphs[j+1].get_text())
-                    # If the length of the after found paragrpah is less than or equal to 2 characters it is most likely a space, number, or bullet point. In that case, skip it by incrementint
-                        while len(after_found) <= 2:
-                            foundcount +=1
-                            after_found = str(doc_paragraphs[j+foundcount].get_text())
-                    except:
-                        after_found = 'None'
+                        # after_found is the instance after the position the primary word was found in, so in that case  +1 the index
+                        try:
+                            after_found = str(doc_paragraphs[j+1].get_text())
+                        # If the length of the after found paragrpah is less than or equal to 2 characters it is most likely a space, number, or bullet point. In that case, skip it by incrementint
+                            while len(after_found) <= 2:
+                                foundcount +=1
+                                after_found = str(doc_paragraphs[j+foundcount].get_text())
+                        except:
+                            after_found = 'None'
 
-                    #For every secondary word in the secondary word list, run the code below
-                    found_dict = {
-                        "CIK" : current_cik[doc],
-                        "Company Name" : getCompanyName(documents[doc]),
-                        "Item": 'Entire Document',
-                        "Primary Word" : primary_wordlist[p_word],
-                        "Tag": tags,
-                        "before": before_found,
-                        "match" : found,
-                        "after" : after_found
-                    } 
-                    print('added to database')
-                    ids = collection.insert_one(found_dict)
-                    print('added', ids)
-                else:
-                    continue
+                        #For every secondary word in the secondary word list, run the code below
+                        found_dict = {
+                            "CIK" : current_cik[doc],
+                            "Company Name" : getCompanyName(documents[doc]),
+                            "Item": 'Entire Document',
+                            "Primary Word" : primary_wordlist[p_word],
+                            "Tag": tags,
+                            "before": before_found,
+                            "match" : found,
+                            "after" : after_found
+                        } 
+                        print('added to database')
+                        '''ids = collection.insert_one(found_dict)
+                        print('added', ids)'''
+                    else:
+                        continue
+        except:
+            zero_found += 1
+            print('cannot find anything, moving on')
+            continue
+
+print(zero_found)

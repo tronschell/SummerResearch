@@ -20,7 +20,8 @@ documents = []
 primary_wordlist = ['COVID-19']
 secondary_wordlist = ['employee', 'furlough', 'furloughed']
 
-not_found = []
+not_found = 0
+
 foundcount = 1
 
 first_count = 0
@@ -107,24 +108,24 @@ for doc in range(int(len(documents))):
                         #adding column names
                         p_data.columns = ['item', 'start', 'end']
                         
-
+                        #grab the start location of the paragraph from the dataframe
                         p_data_loc = p_data['start'].item()
 
+                        #calculate which number in the doc_data list is the closest to the p_data_loc number
                         closest = min(doc_data, key=lambda x:abs(x-p_data_loc))
 
+                        #set this index variable to the index of the closest number
                         index = doc_data.index(closest)
 
                         print('item', test_df['item'][index])
-
-                        
-
-
-
+         
                         print('----------------------')
                     except:
                         print('skipping')
+                        not_found += 1
                         section = 'None'
                         continue
+                    print('number not found:', not_found)
                     
 
                 else:
