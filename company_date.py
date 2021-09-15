@@ -1,7 +1,7 @@
 import os
 from bs4 import BeautifulSoup
 
-def getCompanyName(CIK):
+def getCompanyDate(CIK):
     documents = []
 
     for root, dirs, files, in os.walk('sec-edgar-filings'):
@@ -13,10 +13,8 @@ def getCompanyName(CIK):
         raw = f.read()
         soup = BeautifulSoup(raw, 'lxml')
         try:
-            CName = soup.find('ix:nonnumeric',{'name':'dei:EntityRegistrantName'}).getText()
-            return CName
+            CDate = soup.find('ix:nonnumeric',{'name':'dei:DocumentPeriodEndDate'}).getText()
+            return CDate
         except:
-            CName = 'NONE'
-            return CName
-
-        
+            CDate = 'NONE'
+            return CDate
