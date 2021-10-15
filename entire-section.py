@@ -21,8 +21,10 @@ except:
 
 documents = []
 #count_not_found = 0
-primary_wordlist = ['COVID-19']
-secondary_wordlist = ['salary reduction', 'reducing', 'benefits']
+primary_wordlist = ['supply chain']
+#secondary_wordlist = ['salary reduction', 'reducing', 'benefits']
+secondary_wordlist = ['global', 'international', 'country']
+
 
 not_found = []
 foundcount = 1
@@ -41,6 +43,8 @@ for doc in range(int(len(documents))):
 
 
     with open(path, 'r') as f:
+
+        current_cik = os.listdir('sec-edgar-filings')
 
         raw_10k = f.read()
 
@@ -101,10 +105,10 @@ for doc in range(int(len(documents))):
 
         pos_dat.set_index('item', inplace=True)
 
-        item_1a_raw = document[pos_dat['start'].loc['item1a']]
+        #item_1a_raw = document[pos_dat['start'].loc['item1a']]
 
-        print(re.finditer('item1a'))
-        print(item_1a_raw)
+        #print(re.finditer('item1a'))
+        #print(item_1a_raw)
 
         if (len(p_doc_paragraphs) > len(span_doc_paragraphs)) and (len(p_doc_paragraphs) > len(font_doc_paragraphs)):
             print('using p doc paragraphs')
@@ -168,8 +172,9 @@ for doc in range(int(len(documents))):
                                     "Primary Word" : primary_wordlist[p_word],
                                     "Secondary Word" : secondary_wordlist[s_word],
                                     "Tag": tags,
-                                    "match" : found
+                                    "match" : found[0:40]
                                 }
+                            print(found_dict)
                             print('added to database')
                             '''ids = collection.insert_one(found_dict)
                             print('added', ids)'''
@@ -183,11 +188,12 @@ for doc in range(int(len(documents))):
                                 "Primary Word" : primary_wordlist[p_word],
                                 "Secondary Word" : secondary_wordlist[s_word],
                                 "Tag": tags,
-                                "before": before_found,
-                                "match" : found,
-                                "after" : after_found
+                                "before": before_found[0:40],
+                                "match" : found[0:40],
+                                "after" : after_found[0:40]
                             } 
                             print('added to database')
+                            print(found_dict)
                             '''ids = collection.insert_one(found_dict)
                             print('added', ids)'''
 
@@ -201,10 +207,11 @@ for doc in range(int(len(documents))):
                                     "Primary Word" : primary_wordlist[p_word],
                                     "Secondary Word" : secondary_wordlist[s_word],
                                     "Tag": tags,
-                                    "before": before_found,
-                                    "match" : found
+                                    "before": before_found[0:40],
+                                    "match" : found[0:40]
                                 }
                             print('added to database')
+                            print(found_dict)
                             '''ids = collection.insert_one(found_dict)
                             print('added', ids)'''
 
@@ -217,9 +224,10 @@ for doc in range(int(len(documents))):
                                     "Primary Word" : primary_wordlist[p_word],
                                     "Secondary Word" : secondary_wordlist[s_word],
                                     "Tag": tags,
-                                    "match" : found,
-                                    "after" : after_found}
+                                    "match" : found[0:40],
+                                    "after" : after_found[0:40]}
                             print('added to database')
+                            print(found_dict)
                             '''ids = collection.insert_one(found_dict)
                             print('added', ids)'''
 

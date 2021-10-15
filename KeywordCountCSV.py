@@ -14,6 +14,10 @@ covid_word = 'COVID-19'
 covid_word_count = 0
 supplychain_word = 'supply chain'
 supplychain_word_count = 0
+benefit_word = 'reduction'
+benefit_word_count = 0
+furlough_word = 'furlough'
+furlough_word_count = 0
 
 primaryword = 'supply chain'
 secondaryword = ['international', 'global']
@@ -35,9 +39,8 @@ for root, dirs, files, in os.walk('sec-edgar-filings'):
             documents.append(os.path.join(root, file))
 
 documents.sort()
-
 for doc in range(int(len(documents))):
-#for doc in range(30, 40):
+#for doc in range(20, 40):
     path = str(documents[doc])
 
     current_cik = os.listdir('sec-edgar-filings')
@@ -120,42 +123,53 @@ for doc in range(int(len(documents))):
 
             # If an instance of a primary word is somewhere in the "item_1a_paragrpahs list", then run the code underneath
             if covid_word in doc_paragraphs[j].get_text():
-                covid_word_count = 1
+                covid_word_count += 1
                 print('FOUND COVID-19 keyword')
 
             if supplychain_word in doc_paragraphs[j].get_text():
-                supplychain_word_count = 1
+                supplychain_word_count += 1
                 print('FOUND Supply Chain keyword')
+
+            if furlough_word in doc_paragraphs[j].get_text():
+                furlough_word_count += 1
+                print('FOUND furlough keyword')
+            
+            if benefit_word in doc_paragraphs[j].get_text():
+                benefit_word_count += 1
+                print('FOUND benefit cut keyword')
+            
 
             for i in range(len(secondaryword)):
                 if primaryword in doc_paragraphs[j].get_text() and secondaryword[i] in doc_paragraphs[j].get_text():
-                    internationalsupplychain_count = 1
+                    internationalsupplychain_count += 1
                     print('FOUND international supply chain keyword')
 
             for y in range(len(secondaryword)):
                 if secondaryword[y] in found:
-                    comboparagraph =1
+                    comboparagraph += 1
                 elif secondaryword[y] in before_found:
-                    comboparagraph = 1
+                    comboparagraph += 1
                 elif secondaryword[y] in after_found:
-                    comboparagraph = 1
+                    comboparagraph += 1
 
             
 
-    data.append([current_cik[doc], getCompanyName(documents[doc]), getCompanyDate(documents[doc]),covid_word_count, supplychain_word_count, internationalsupplychain_count, comboparagraph])
+    data.append([current_cik[doc], getCompanyName(documents[doc]), getCompanyDate(documents[doc]),covid_word_count, supplychain_word_count,furlough_word_count, benefit_word_count, internationalsupplychain_count, comboparagraph])
     covid_word_count = 0
     supplychain_word_count = 0
+    furlough_word_count = 0
+    benefit_word_count = 0
     internationalsupplychain_count = 0
     comboparagraph = 0
     
     
 #print(data)
-df = pd.DataFrame(data, columns=['CIK', 'CompanyName', 'FiscalYearEnd','COVID-19', 'SupplyChain', 'InternationalSupplyChain', 'ComboParagraph'])
+df = pd.DataFrame(data, columns=['CIK', 'CompanyName', 'FiscalYearEnd','COVID-19', 'SupplyChain', 'Furlough', 'Benefit Cut',  'InternationalSupplyChain', 'ComboParagraph'])
 df.head()
 
-df.to_csv('DATA_FINAL.csv', index=False ,encoding='utf-8')
-
-print('converted to a csv')
+df.to_csv('DATA_FINAL4.csv', index=False ,encoding='utf-8')
+                                           
+print('converted to a csv') 
 
 
 
